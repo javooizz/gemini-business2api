@@ -768,71 +768,68 @@
 
         <!-- 定时任务 Tab -->
         <div v-if="activeTaskTab === 'scheduled'" class="flex min-h-0 flex-1 flex-col">
-          <div v-if="isLoadingScheduledConfig" class="flex items-center justify-center py-8">
-            <div class="text-sm text-muted-foreground">加载中...</div>
-          </div>
-          <div v-else class="flex min-h-0 flex-1 flex-col">
-            <div class="flex-1 overflow-y-auto px-6 py-4">
-              <div class="space-y-6">
-            <div class="space-y-4">
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="text-sm font-medium text-foreground">启用定时刷新</p>
-                  <p class="mt-1 text-xs text-muted-foreground">自动检测并刷新即将过期的账号</p>
+          <div class="flex min-h-0 flex-1 flex-col">
+              <div class="flex-1 overflow-y-auto px-6 py-4">
+                <div class="space-y-4">
+                  <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <p class="text-sm font-medium text-foreground">启用定时刷新</p>
+                        <p class="mt-1 text-xs text-muted-foreground">自动检测并刷新即将过期的账号</p>
+                      </div>
+                      <button
+                        type="button"
+                        class="relative inline-flex h-5 w-10 items-center rounded-full transition-colors"
+                        :class="scheduledRefreshEnabled ? 'bg-primary' : 'bg-muted'"
+                        @click="scheduledRefreshEnabled = !scheduledRefreshEnabled"
+                      >
+                        <span
+                          class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
+                          :class="scheduledRefreshEnabled ? 'translate-x-5' : 'translate-x-1'"
+                        ></span>
+                      </button>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label class="block text-xs text-muted-foreground">检测间隔（分钟）</label>
+                      <input
+                        v-model.number="scheduledRefreshInterval"
+                        type="number"
+                        min="0"
+                        max="720"
+                        class="w-full rounded-2xl border border-input bg-background px-3 py-2 text-sm"
+                      />
+                      <p class="text-xs text-muted-foreground">
+                        范围：0-720 分钟（{{ Math.floor(scheduledRefreshInterval / 60) }} 小时 {{ scheduledRefreshInterval % 60 }} 分钟）
+                      </p>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label class="block text-xs text-muted-foreground">过期刷新窗口（小时）</label>
+                      <input
+                        v-model.number="refreshWindowHours"
+                        type="number"
+                        min="1"
+                        max="168"
+                        class="w-full rounded-2xl border border-input bg-background px-3 py-2 text-sm"
+                      />
+                      <p class="text-xs text-muted-foreground">
+                        当账号距离过期小于等于该值时，会触发自动刷新
+                      </p>
+                    </div>
+
+                    <div class="rounded-2xl border border-border bg-muted/30 px-4 py-3 text-xs text-muted-foreground">
+                      <p class="mb-2 font-medium text-foreground">说明</p>
+                      <ul class="list-inside list-disc space-y-1">
+                        <li>定时任务会在后台自动运行，无需手动触发</li>
+                        <li>每次检测会自动刷新即将过期的账号（距离过期 ≤ 过期刷新窗口）</li>
+                        <li>修改配置后立即生效，无需重启服务</li>
+                        <li>禁用后，定时任务将停止运行</li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
-                <button
-                  type="button"
-                  class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
-                  :class="scheduledRefreshEnabled ? 'bg-primary' : 'bg-muted'"
-                  @click="scheduledRefreshEnabled = !scheduledRefreshEnabled"
-                >
-                  <span
-                    class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
-                    :class="scheduledRefreshEnabled ? 'translate-x-6' : 'translate-x-1'"
-                  ></span>
-                </button>
               </div>
-
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-foreground">检测间隔（分钟）</label>
-                <input
-                  v-model.number="scheduledRefreshInterval"
-                  type="number"
-                  min="0"
-                  max="720"
-                  class="w-full rounded-2xl border border-input bg-background px-3 py-2 text-sm"
-                />
-                <p class="text-xs text-muted-foreground">
-                  范围：0-720 分钟（{{ Math.floor(scheduledRefreshInterval / 60) }} 小时 {{ scheduledRefreshInterval % 60 }} 分钟）
-                </p>
-              </div>
-
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-foreground">过期刷新窗口（小时）</label>
-                <input
-                  v-model.number="refreshWindowHours"
-                  type="number"
-                  min="1"
-                  max="168"
-                  class="w-full rounded-2xl border border-input bg-background px-3 py-2 text-sm"
-                />
-                <p class="text-xs text-muted-foreground">
-                  当账号距离过期小于等于该值时，会触发自动刷新
-                </p>
-              </div>
-
-              <div class="rounded-2xl border border-border bg-muted/30 px-4 py-3 text-xs text-muted-foreground">
-                <p class="font-medium text-foreground mb-2">说明</p>
-                <ul class="space-y-1 list-disc list-inside">
-                  <li>定时任务会在后台自动运行，无需手动触发</li>
-                  <li>每次检测会自动刷新即将过期的账号（距离过期 ≤ 过期刷新窗口）</li>
-                  <li>修改配置后立即生效，无需重启服务</li>
-                  <li>禁用后，定时任务将停止运行</li>
-                </ul>
-              </div>
-            </div>
-              </div>
-            </div>
 
             <!-- 固定底部按钮区域 -->
             <div class="flex items-center justify-end gap-2 border-t border-border/60 px-6 py-4">
@@ -858,12 +855,7 @@
         <!-- 历史记录 Tab -->
         <div v-if="activeTaskTab === 'history'" class="flex min-h-0 flex-1 flex-col">
           <div class="flex-1 overflow-y-auto px-6 py-4">
-            <div v-if="isLoadingHistory" class="flex items-center justify-center py-8">
-              <svg class="h-6 w-6 animate-spin text-primary" viewBox="0 0 24 24" fill="none">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-            </div>
+            <div v-if="isLoadingHistory" class="py-8"></div>
             <div v-else-if="taskHistory.length === 0" class="rounded-2xl border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
               <p class="font-medium text-foreground mb-2">暂无历史记录</p>
               <p>完成的任务将显示在这里</p>
